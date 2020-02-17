@@ -1,0 +1,11 @@
+{
+    "name": "5GuysBot",
+    "version": "1.0.0",
+    "description": "Does some things and stuff.",
+    "main": "bot.js",
+    "author": "Hayden Jeanson",
+    "dependencies": {
+        "discord.io": "^2.5.3",
+        "winston": "^3.2.1"
+    }
+}
