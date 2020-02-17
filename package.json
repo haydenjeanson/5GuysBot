@@ -5,7 +5,7 @@
     "main": "bot.js",
     "author": "Hayden Jeanson",
     "dependencies": {
-        "discord.io": "https://github.com/Woor/discord.io/tarball/gateway_v6",
+        "discord.io": "github:woor/discord.io#gateway_v6",
         "winston": "^3.2.1"
     }
 }

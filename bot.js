@@ -17,10 +17,11 @@ bot.on('ready', function (evt) {
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
 });
-bot.on('message', function (user, userID, channelID, message, evt) {
+bot.on('message', async function (user, userID, channelID, message, evt) {
     // Our bot needs to know if it will execute a command
     // It will listen for messages that will start with `!`
     if (message.includes(":Kappapride:")) {
+        await new Promise(r => setTimeout(r, 1000));
         bot.sendMessage({
             to: channelID,
             message: 'HA! GaaAAAY!'
