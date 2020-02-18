@@ -22,10 +22,13 @@ bot.on('message', async (message) => {
         var cmd = args[0];
        
         args = args.splice(1);
-        switch(cmd) {
+        switch(cmd.toLowerCase()) {
             // !ping
             case 'ping':
                 message.channel.send('Pong!')
+            break;
+            case 'marco':
+                message.channel.send('Polo!');
             break;
             case 'insult':
                 getJSON('https://www.reddit.com/r/insults/top.json?t=month', (error, response) => {
