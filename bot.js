@@ -10,8 +10,6 @@ bot.on('ready', () => {
 });
 
 bot.on('message', async (message) => {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
     if (message.content.includes(":Kappapride:")) {
         await new Promise(r => setTimeout(r, 1000));
         message.channel.send('HA! GaaAAAY!');
@@ -19,10 +17,8 @@ bot.on('message', async (message) => {
 
     if (message.content.substring(0, 1) == '!') {
         var args = message.content.substring(1).split(' ');
-        var cmd = args[0];
-       
-        args = args.splice(1);
-        switch(cmd.toLowerCase()) {
+
+        switch(args[0].toLowerCase()) {
             // !ping
             case 'ping':
                 message.channel.send('Pong!')
@@ -31,12 +27,24 @@ bot.on('message', async (message) => {
                 message.channel.send('Polo!');
             break;
             case 'insult':
+                var user = ""
+                if (args.length > 1) {
+                    user = message.mentions.members.first();
+                }
+
                 getJSON('https://www.reddit.com/r/insults/top.json?t=month', (error, response) => {
                     numInsults = response.data.children.length
                     rndNum = Math.round((Math.random() * numInsults) - 1);
 
-                    message.channel.send(response.data.children[rndNum].data.title);
+                    if (user != "") {
+                        message.channel.send(user + ', ' + response.data.children[rndNum].data.title);
+                    } else {
+                        message.channel.send(response.data.children[rndNum].data.title);
+                    }
                 });
+            break;
+            case 'help':
+                message.channel.send('Available Commands:\n\n!ping - The bot responds Pong!\n!marco - The bot responds Polo!\n!insult - Sends an insult randomly chosen from the top posts of the last month on r/insults')
             break;
          }
      }
