@@ -1,5 +1,7 @@
 const Discord = require('discord.js');
 const auth = require('./auth.json');
+const insult = require('./insult.js');
+const getJSON = require('get-json');
 
 // Initialize Discord Bot
 const bot = new Discord.Client();
@@ -26,7 +28,14 @@ bot.on('message', async (message) => {
             case 'ping':
                 message.channel.send('Pong!')
             break;
-            // Just add any case commands if you want to..
+            case 'insult':
+                getJSON('https://www.reddit.com/r/insults/top.json?t=month', (error, response) => {
+                    numInsults = response.data.children.length
+                    rndNum = Math.round((Math.random() * numInsults) - 1);
+
+                    message.channel.send(response.data.children[rndNum].data.title);
+                });
+            break;
          }
      }
 
