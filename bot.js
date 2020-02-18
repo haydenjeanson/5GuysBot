@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const auth = require('./auth.json');
-const insult = require('./insult.js');
 const getJSON = require('get-json');
 
 // Initialize Discord Bot
