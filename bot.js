@@ -38,7 +38,7 @@ bot.on('message', async (message) => {
                     user = message.mentions.members.first();
                 }
 
-                getJSON('https://www.reddit.com/r/insults/top.json?t=day', (err, response) => {
+                getJSON('https://www.reddit.com/r/insults/top.json?t=month', (err, response) => {
                     var insultArr = [];
                     fs.readFile(INSULT_PATH, 'utf-8', (err, data) => {
                         if (err) throw err;
