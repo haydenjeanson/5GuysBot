@@ -189,6 +189,8 @@ bot.on('message', async (message) => {
                     fs.close(fd, (err) => {
                         if (err) throw err;
                     });
+
+                    message.channel.send("You made this insult? I made this insult.");
                 });
             break;
             case 'addquote':
@@ -207,6 +209,8 @@ bot.on('message', async (message) => {
                     fs.close(fd, (err) => {
                         if (err) throw err;
                     });
+
+                    message.channel.send("Quote added.");
                 });
             break;
 
@@ -265,6 +269,9 @@ bot.on('message', async (message) => {
             !ping - The bot responds Pong!\n\
             !marco - The bot responds Polo!\n\
             !insult - Sends an insult randomly chosen from the top posts of the last month on r/insults\n\
+            !addinsult - Adds a new insult\n\
+            !quote - Sends a random quote from the quotes that have been added using !addquote\n\
+            !addquote <name> - Add a quote said by <name>\n\
             !thought - Sends an showerthought randomly chosen from the top posts of the last month on r/showerthoughts\n\
             !fact - Sends a fact randomly chosen from the top posts of the last month on r/todayilearned\n\
             !sub - Display a post from any subreddit given a name, and optional category and time. See !sub help\n\
