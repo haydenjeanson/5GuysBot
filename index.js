@@ -3,40 +3,57 @@ const auth = require('./auth.json');
 const getJSON = require('get-json');
 const fs = require('fs');
 
+// Load all command files and create empty map. Map will be populated when the bot is ready
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+let commands = new Map();
+
 // Set intents of the client
 const clientIntents = new Intents();
 clientIntents.add('GUILD_MESSAGES');
-clientIntents.add('GUILD_MESSAGE_TYPING');
-// Initialize Discord Bot
+
+// Initialize Discord Bot (client)
 const client = new Client({intents: clientIntents});
 
-const commandData = {
-    name: 'echo',
-    description: 'Replies with your input!',
-    options: [{
-      name: 'input',
-      type: 'STRING',
-      description: 'The input which should be echoed back',
-      required: true,
-    }],
-  };
-
+// When the client first starts
 client.once('ready', () => {
     console.log('I am ready!'); 
 
-    client.guilds.cache.get(auth.guildID).commands.create(commandData);
+    /* List all commands in the specified guild:
+    client.guilds.cache.get(auth.guildID).commands.fetch()
+        .then(commands => commands.forEach((command) => console.log(command)))
+        .catch(console.error);
+    */
+    /* Delete command from guild. Retrieve command id using the previous command list.
+    client.guilds.cache.get(auth.guildID).commands.delete('843936307906609202');
+    */
+
+    for (const file of commandFiles) {
+        const command = require(`./commands/${file}`);
+    
+        // set a new item in the Collection, key is command name value is exported module
+        commands.set(command.name, command);
+
+        commandData = {
+            name: command.name,
+            description: command.description,
+            options: command.options
+        }
+
+        // Add guild command
+        client.guilds.cache.get(auth.guildID).commands.create(commandData);
+    }
 });
 
-client.on('interaction', interaction => {
+// When a slash command is performed
+client.on('interaction', (interaction) => {
     // If the interaction isn't a slash command, return
-    if (!interaction.isCommand()) return;
+    if (!interaction.isCommand() || !commands.has(interaction.commandName)) return;
 
-    // Check if it is the correct command
-    if (interaction.commandName === 'echo') {
-        // Get the input of the user
-        const input = interaction.options[0].value;
-        // Reply to the command
-        interaction.reply(input);
+    try {
+        commands.get(interaction.commandName).execute(interaction);
+    } catch (error) {
+        console.error(error);
+        interaction.reply('An unknown error occurred.');
     }
 })
 
