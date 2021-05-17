@@ -27,21 +27,6 @@ client.once('ready', () => {
     client.guilds.cache.get(auth.guildID).commands.create(commandData);
 });
 
-client.on('message', async (message) => {
-    if (message.content.substring(0, 1) == '!') {
-        var args = message.content.substring(1).split(' ');
-        var cmd = args[0];
-
-        args = args.slice(1);
-
-        switch(cmd.toLowerCase()) {
-            case 'ping':
-                message.channel.send('Pong!')
-            break;
-         }
-     }
-});
-
 client.on('interaction', interaction => {
     // If the interaction isn't a slash command, return
     if (!interaction.isCommand()) return;
