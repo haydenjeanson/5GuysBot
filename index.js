@@ -3,6 +3,16 @@ const auth = require('./auth.json');
 const getJSON = require('get-json');
 const fs = require('fs');
 
+// Initialize Cloud Firestore
+const admin = require('firebase-admin');
+const serviceAccount = require('./googleServiceAuth.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+
 // Load all command files and create empty map. Map will be populated when the bot is ready
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 let commands = new Map();
@@ -50,7 +60,7 @@ client.on('interaction', (interaction) => {
     if (!interaction.isCommand() || !commands.has(interaction.commandName)) return;
 
     try {
-        commands.get(interaction.commandName).execute(client, interaction);
+        commands.get(interaction.commandName).execute(interaction, client, db);
     } catch (error) {
         console.error(error);
         interaction.reply('An unknown error occurred.');

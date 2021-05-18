@@ -2,7 +2,7 @@ module.exports = {
     name: 'ping',
     description: 'Replies with Pong!',
     options: [],
-    execute(_, interaction) {
+    execute(interaction) {
         interaction.reply('Pong!', {ephemeral: true});
     }
 }
