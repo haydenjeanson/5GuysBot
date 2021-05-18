@@ -1,3 +1,12 @@
+const admin = require('firebase-admin');
+
+/**
+ * 
+ * @param {FirebaseFirestore.Firestore} db Firebase db connection
+ * @param {String} quotedID The ID of the user who's quote is to be added
+ * @param {String} quote The quote to be added
+ * @returns {Boolean} true if successfully added, else false
+ */
 async function addQuote(db, quotedID, quote) {
     try {
         const docRef = db.collection('users').doc(quotedID);
@@ -7,7 +16,13 @@ async function addQuote(db, quotedID, quote) {
             await docRef.set({
                 0: quote,
                 'maxIndex': 0
-            }); 
+            });
+            
+            // Update array of user Ids with new user
+            const userIdsRef = db.collection('users').doc('userIds');
+            await userIdsRef.update({
+                'userIds': admin.firestore.FieldValue.arrayUnion(quotedID)
+            });
         } else {
             // Retrieve previous maxIndex and increment as we are about to add a new quote.
             let maxIndex = (await doc.get('maxIndex')) + 1;
@@ -27,19 +42,40 @@ async function addQuote(db, quotedID, quote) {
     }    
 }
 
-// async function readQuote(db, quotedID, key) {
+/**
+ * 
+ * @param {FirebaseFirestore.Firestore} db Firebase db connection
+ * @param {String} quotedID Optional. The ID of the user who's quote is to be retrieved
+ * @param {String} key Optional. A fragment of the quote to be retrieved.
+ * @returns 
+ */
+// async function readQuote(db, quotedID = null, key = null) {
 //     try {
-//         const snapshot = await db.collection('users').get();
-//         snapshot.forEach((doc) => {
-//             console.log(doc.id, '=>', doc.data());
-//         });
 
-//         // Function exectuted successfully
-//         return true
+//         const docRef = db.collection('users').doc(quotedID);
+//         const doc = await docRef.get();
+//         if (!doc.exists) {
+//             // No such document
+//             await docRef.set({
+//                 0: quote,
+//                 'maxIndex': 0
+//             }); 
+//         } else {
+//             // Retrieve previous maxIndex and increment as we are about to add a new quote.
+//             let maxIndex = (await doc.get('maxIndex')) + 1;
+
+//             await docRef.set({
+//                 [maxIndex]: quote,
+//                 'maxIndex': maxIndex
+//             }, { merge: true }); // Merge with the current doc if it already exists instead of overwriting
+//         }
+    
+//         // Function executed successfully
+//         return true;
 //     } catch (error) {
 //         console.error(error);
 //         // Something went wrong
-//         return false
+//         return false;
 //     }    
 // }
 
