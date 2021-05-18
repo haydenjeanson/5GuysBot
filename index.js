@@ -50,11 +50,12 @@ client.on('interaction', (interaction) => {
     if (!interaction.isCommand() || !commands.has(interaction.commandName)) return;
 
     try {
-        commands.get(interaction.commandName).execute(interaction);
+        commands.get(interaction.commandName).execute(client, interaction);
     } catch (error) {
         console.error(error);
         interaction.reply('An unknown error occurred.');
     }
+    
 })
 
 client.login(auth.token);
