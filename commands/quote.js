@@ -167,10 +167,11 @@ module.exports = {
 
             // Edit the deffered response
             if (quoteAdded) {
-                interaction.editReply("Quote Added!");
+                interaction.editReply('Quote Added!');
                 // followUp with quote that was added
+                interaction.followUp(`${(await client.users.fetch(interaction.options[0].options[0].value)).username}: ${interaction.options[0].options[1].value}`);
             } else {
-                interaction.editReply("Uh Oh! Something went wrong. The quote was not added.");
+                interaction.editReply('Uh Oh! Something went wrong. The quote was not added.');
             }
         } else if (interaction.options[0].name === 'show') {
             if (interaction.options[0].options != undefined) {
