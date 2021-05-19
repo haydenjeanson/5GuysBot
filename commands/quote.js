@@ -167,9 +167,7 @@ module.exports = {
 
             // Edit the deffered response
             if (quoteAdded) {
-                interaction.editReply('Quote Added!');
-                // followUp with quote that was added
-                interaction.followUp(`${(await client.users.fetch(interaction.options[0].options[0].value)).username}: ${interaction.options[0].options[1].value}`);
+                interaction.editReply(`Quote Added!\n${(await client.users.fetch(interaction.options[0].options[0].value)).username}: ${interaction.options[0].options[1].value}`);
             } else {
                 interaction.editReply('Uh Oh! Something went wrong. The quote was not added.');
             }
