@@ -50,7 +50,10 @@ client.once('ready', () => {
         }
 
         // Add guild command
-        client.guilds.cache.get(auth.guildID).commands.create(commandData);
+        // client.guilds.cache.get(auth.guildID).commands.create(commandData);
+
+        // Add global command
+        await client.application?.commands.create(commandData);
     }
 });
 
