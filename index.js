@@ -53,7 +53,7 @@ client.once('ready', () => {
         // client.guilds.cache.get(auth.guildID).commands.create(commandData);
 
         // Add global command
-        client.application.commands.create(commandData);
+        client.application?.commands.create(commandData);
     }
 });
 
