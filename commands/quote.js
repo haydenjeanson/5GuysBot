@@ -50,11 +50,11 @@ async function addQuote(db, quotedID, quote) {
  * @param {String} key Optional. A fragment of the quote to be retrieved.
  * @returns 
  */
-// TODO: Implement with ID
 async function getQuote(db, quotedID = null, key = null) {
     try {
+        let quote = 'A quote could not be found'; // This will get updated when a quote is found
+
         if (quotedID === null) {
-            
             // Get array of user Ids
             const userIdsRef = db.collection('users').doc('userIds');
             const userIdsDoc = await userIdsRef.get();
@@ -62,62 +62,49 @@ async function getQuote(db, quotedID = null, key = null) {
             let userIds = await userIdsDoc.get('userIds');
             
             // Select random id from array
-            let randomId = userIds[Math.floor(Math.random() * userIds.length)];
+            quotedID = userIds[Math.floor(Math.random() * userIds.length)];
+        }
 
-            // Get maxIndex from selected Id
-            const userDocRef = db.collection('users').doc(randomId);
-            const userDoc = await userDocRef.get();
-            if (!userDoc.exists) {
-                throw `Error (getQuote): Random user doc ${randomId} does not exist.`;
-            } else {
-                
-                if (key === null) {
-                    maxIndex = userDoc.get('maxIndex');
-                    
-                    // Get random number between 0 and maxIndex and return the corresponding quote fron selected Id
-                    randomIndex = Math.floor(Math.random() * maxIndex);
-                    quote = userDoc.get(`${randomIndex}`);
-                    
-                    return quote;
-                } else {
-                    // Fill quotes object with all of the users quotes and remove the maxIndex field
-                    let quotes = userDoc.data();
-                    let numQuotes = quotes['maxIndex'] + 1; // number of quotes needs to add the quote at index 0
-                    delete quotes['maxIndex'];
+        // Get document for selected user
+        const userDocRef = db.collection('users').doc(quotedID);
+        const userDoc = await userDocRef.get();
 
-                    return findQuoteByKey(quotes, numQuotes, key);
-                }
-            }
+        if (!userDoc.exists) {
+            throw `Error (getQuote): Random user doc ${quotedID} does not exist.`;
         } else {
+            if (key === null) {
+                maxIndex = userDoc.get('maxIndex');
+                
+                // Get random number between 0 and maxIndex and return the corresponding quote fron selected Id
+                randomIndex = Math.floor(Math.random() * maxIndex);
+                quote = userDoc.get(`${randomIndex}`);
+            } else {
+                let matches = [];
+                let quotes = userDoc.data();
 
+                let numQuotes = quotes['maxIndex'] + 1; // number of quotes needs to add the quote at index 0
+                delete quotes['maxIndex']; // Remove this from quotes object since its not a quote
+
+                for (i = 0; i < numQuotes; i++) {
+                    if (quotes[i].includes(key)) {
+                        matches.push(quotes[i]);
+                    }
+                }
+
+                quote = matches[Math.floor(Math.random() * matches.length)];
+            }
         }
     
-        // Function executed successfully
-        return true;
+        if (quote === undefined) {
+            return 'A quote could not be found';
+        } else {
+            return quote;
+        }
     } catch (error) {
         console.error(error);
         // Something went wrong
-        return false;
+        return 'An unknown error occurred.';
     }    
-}
-
-/**
- * Returns a random quote that contains the key from the array of quotes
- * @param {Object} quotes Object of quotes to search through for key
- * @param {String} key String to search for
- */
-function findQuoteByKey(quotes, numQuotes, key) {
-    let matches = [];
-
-    for (i = 0; i < numQuotes; i++) {
-        if (quotes[i].includes(key)) {
-            matches.push(quotes[i]);
-        }
-    }
-
-    let randomQuote = matches[Math.floor(Math.random() * matches.length)];
-
-    return randomQuote;
 }
 
 module.exports = {
