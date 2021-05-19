@@ -45,12 +45,13 @@ async function addQuote(db, quotedID, quote) {
 
 /**
  * Gets a quote from the firebase firestore
+ * @param {Client} client Discord client
  * @param {FirebaseFirestore.Firestore} db Firebase db connection
  * @param {String} quotedID Optional. The ID of the user who's quote is to be retrieved
  * @param {String} key Optional. A fragment of the quote to be retrieved.
  * @returns 
  */
-async function getQuote(db, quotedID = null, key = null) {
+async function getQuote(client, db, quotedID = null, key = null) {
     try {
         let quote = 'A quote could not be found'; // This will get updated when a quote is found
 
@@ -98,6 +99,8 @@ async function getQuote(db, quotedID = null, key = null) {
         if (quote === undefined) {
             return 'A quote could not be found';
         } else {
+            // Add username of quoted person before returning
+            quote = `${(await client.users.fetch(quotedID)).username}: ${quote}`;
             return quote;
         }
     } catch (error) {
@@ -170,25 +173,24 @@ module.exports = {
                 interaction.editReply("Uh Oh! Something went wrong. The quote was not added.");
             }
         } else if (interaction.options[0].name === 'show') {
-            // TODO: Add username to quote string before displaying
             if (interaction.options[0].options != undefined) {
                 if (interaction.options[0].options[0] != undefined) {
                     if (interaction.options[0].options[0].name === 'user') {
                         if (interaction.options[0].options[1] != undefined && interaction.options[0].options[1].name === 'key') {
                             // name and key are present
-                            quote = await getQuote(db, interaction.options[0].options[0].value, interaction.options[0].options[1].value);
+                            quote = await getQuote(client, db, interaction.options[0].options[0].value, interaction.options[0].options[1].value);
                         } else {
                             // name present, no key
-                            quote = await getQuote(db, interaction.options[0].options[0].value);
+                            quote = await getQuote(client, db, interaction.options[0].options[0].value);
                         }
                     } else if (interaction.options[0].options[0].name === 'key') {
                         // key present, no name
-                        quote = await getQuote(db, null, interaction.options[0].options[0].value);
+                        quote = await getQuote(client, db, null, interaction.options[0].options[0].value);
                     }
                 }
             } else {
                 // no name or key
-                quote = await getQuote(db);
+                quote = await getQuote(client, db);
             }
 
             interaction.editReply(quote);
