@@ -54,6 +54,7 @@ async function addQuote(db, quotedID, quote) {
 async function getQuote(client, db, quotedID = null, key = null) {
     try {
         let quote = 'A quote could not be found'; // This will get updated when a quote is found
+        let randomId = false;
 
         if (quotedID === null) {
             // Get array of user Ids
@@ -64,6 +65,7 @@ async function getQuote(client, db, quotedID = null, key = null) {
             
             // Select random id from array
             quotedID = userIds[Math.floor(Math.random() * userIds.length)];
+            randomId = true;
         }
 
         // Get document for selected user
@@ -78,21 +80,26 @@ async function getQuote(client, db, quotedID = null, key = null) {
                 
                 // Get random number between 0 and maxIndex and return the corresponding quote fron selected Id
                 randomIndex = Math.floor(Math.random() * maxIndex);
+
+                quoteUser = (await client.users.fetch(quotedID)).username
                 quote = userDoc.get(`${randomIndex}`);
             } else {
-                let matches = [];
-                let quotes = userDoc.data();
-
-                let numQuotes = quotes['maxIndex'] + 1; // number of quotes needs to add the quote at index 0
-                delete quotes['maxIndex']; // Remove this from quotes object since its not a quote
-
-                for (i = 0; i < numQuotes; i++) {
-                    if (quotes[i].includes(key)) {
-                        matches.push(quotes[i]);
+                let quotes = [[userDoc.id, userDoc.data()]];
+                
+                if (randomId) {
+                    const userRef = db.collection('users');
+                    const allUsers = await userRef.get();
+                    
+                    for (i = 0; i < allUsers.size; i++) {
+                        quotes.push([allUsers.docs[i].id, allUsers.docs[i].data()]);
                     }
                 }
 
-                quote = matches[Math.floor(Math.random() * matches.length)];
+                quoteInfo = findQuoteByKey(quotes, key);
+
+                quoteUser = (await client.users.fetch(quoteInfo[0])).username;
+                quote = quoteInfo[1];
+
             }
         }
     
@@ -100,7 +107,7 @@ async function getQuote(client, db, quotedID = null, key = null) {
             return 'A quote could not be found';
         } else {
             // Add username of quoted person before returning
-            quote = `${(await client.users.fetch(quotedID)).username}: ${quote}`;
+            quote = `${quoteUser}: ${quote}`;
             return quote;
         }
     } catch (error) {
@@ -108,6 +115,30 @@ async function getQuote(client, db, quotedID = null, key = null) {
         // Something went wrong
         return 'An unknown error occurred.';
     }    
+}
+
+/**
+ * Returns a random quote that contains the key from the array of quotes
+ * @param {Array} quotes Object of quotes to search through for key
+ * @param {String} key String to search for
+ */
+ function findQuoteByKey(quotes, key) {
+    let matches = [];
+
+    quotes.forEach((userQuotes) => {
+        let numQuotes = userQuotes[1]['maxIndex'] + 1; // number of quotes needs to add the quote at index 0
+        delete userQuotes[1]['maxIndex']; // Remove this from quotes object since its not a quote
+
+        for (i = 0; i < numQuotes; i++) {
+            if (userQuotes[1][i].includes(key)) {
+                matches.push([userQuotes[0] ,userQuotes[1][i]]);
+            }
+        }
+    })
+
+    let randomQuote = matches[Math.floor(Math.random() * matches.length)];
+
+    return randomQuote;
 }
 
 module.exports = {
