@@ -2,10 +2,11 @@
     "name": "5GuysBot",
     "version": "1.0.0",
     "description": "Does some things and stuff.",
-    "main": "bot.js",
+    "main": "index.js",
     "author": "Hayden Jeanson",
     "dependencies": {
-        "discord.js": "^11.5.1",
+        "discord.js": "github:discordjs/discord.js",
+        "firebase-admin": "^9.8.0",
         "get-json": "^1.0.1"
     }
 }
